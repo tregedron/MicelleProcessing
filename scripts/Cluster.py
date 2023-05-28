@@ -43,7 +43,7 @@ class Cluster:
     def cluster_frame(self):
         self.create_positions()
         custom_distance_matrix = custom_distance(self.positions, self.frame.cell.lengths)
-        self.clustering = DBSCAN(eps=self.cutoff, min_samples=self.neighbours, metric='precomputed').fit(custom_distance_matrix).labels_
+        self.clustering = DBSCAN(eps=self.cutoff, min_samples=self.neighbours, metric='precomputed', n_jobs=2).fit(custom_distance_matrix).labels_
 
         if self.selection is not None:
             self.expand_clustering_to_full_frame()

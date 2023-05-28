@@ -48,26 +48,12 @@ class DiffCalcer:
             self.calculated_times += 1
             self.till_last_time_calculated = 0
 
+            d_r = self.coordinates - self.coordinates[(self.step_iterator + 1) % self.window]
+            d_box = (self.boxes - self.boxes[(self.step_iterator + 1) % self.window])\
+                        * 0.5 * (self.cells[(self.step_iterator + 1) % self.window] + self.cells)
+            distance = ((d_r + d_box) ** 2).sum(axis=-1)
             for i in range(self.window):
-                d_r = self.coordinates[(self.step_iterator + 1 + i) % self.window] - self.coordinates[(self.step_iterator + 1) % self.window]
-                d_box = (self.boxes[ (self.step_iterator + 1 + i) % self.window] - self.boxes[(self.step_iterator + 1) % self.window])\
-                        * 0.5 * (self.cells[(self.step_iterator + 1) % self.window] + self.cells[(self.step_iterator + 1 + i) % self.window])
-                distance = ((d_r + d_box) ** 2).sum(axis=-1)
-                self.shifts[i] += distance
-
-                if i == 1 and distance > 1:
-                    print("something wrong, dist = ", distance)
-                    print("dr")
-                    print(d_r)
-                    print("dbox")
-                    print(d_box)
-                    print("coordinates")
-                    print(self.coordinates)
-                    print("cells")
-                    print(self.cells)
-                    print("boxes")
-                    print(self.boxes)
-                    print("Don't ignore me!!!")
+                self.shifts[i] += distance[(self.step_iterator + 1 + i) % self.window]
 
     def collect_data(self, shifts, shifts_calculated_times):
         shifts += self.shifts
