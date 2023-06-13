@@ -59,6 +59,10 @@ def calc_list_correlation(corr_calcer_list):
     return corr_frame, corr_calculated_times_frame
 
 
+def linear(x, a, b):
+    return a*x+b
+
+
 if __name__ == '__main__':
     a = np.array([1, 1, 0])
     b = np.array([1, 1, 0])
