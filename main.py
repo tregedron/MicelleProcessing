@@ -9,9 +9,19 @@ import numpy as np
 import pandas as pd
 import os
 import time
+import argparse
 
 
 def calculate_diff_coefficients(trj_path: str, topol_path: str, window: int, shift: int):
+    '''
+    usage example: python main.py -trj data/100ns_NPT_1_8_ext.xtc -top data/100ns_NPT_1_8micelles.gro -w 5000 -s 1 > logs/log_1_8_1_ext
+
+    :param trj_path:
+    :param topol_path:
+    :param window:
+    :param shift:
+    :return:
+    '''
     print("Working on trajectory", trj_path)
     print("topology: ", topol_path)
     print("Window: ", window, " shift: ", shift)
@@ -73,11 +83,14 @@ def calculate_diff_coefficients(trj_path: str, topol_path: str, window: int, shi
                     micelles_list.pop(position)
                     diff_calcer_list.pop(position)
 
-            print("Step = ", frame.step, len(micelles_list), " micelles ", ids)
+            print("Step = ", frame.step, len(micelles_list), " micelles ", ids, shifts_calculated_times)
             # if frame.step == 5000:
             #     for diff_calcer in diff_calcer_list:
             #         diff_calcer.collect_data(shifts, shifts_calculated_times)
             #     break
+
+    for diff_calcer in diff_calcer_list:
+        diff_calcer.collect_data(shifts, shifts_calculated_times)
 
     print(f"there were {shifts_calculated_times} shifts")
     shifts = shifts/shifts_calculated_times
@@ -92,7 +105,7 @@ def calculate_diff_coefficients(trj_path: str, topol_path: str, window: int, shi
     path_out_dir = os.path.join("results", trj_path.split("/")[-1].split(".")[0])
     os.makedirs(path_out_dir, exist_ok=True)
 
-    df.to_csv(os.path.join(path_out_dir, f"dr_{window}_{shift}"), sep='\t')
+    df.to_csv(os.path.join(path_out_dir, f"dr_{window}_{shift}_1"), sep='\t')
 
 
 def calculate_corr(trj_path: str, topol_path: str):
@@ -179,24 +192,25 @@ def calculate_corr(trj_path: str, topol_path: str):
 
 
 if __name__ == '__main__':
-    # parser = argparse.ArgumentParser(description='PyTorch Template')
-    # parser.add_argument('-trj', '--trajectory', default=None, type=str,
-    #                     help='trajectory file in xtc format (or not in xtc)')
-    # parser.add_argument('-top', '--topology', default=None, type=str,
-    #                     help='topology file in gro format')
-    # parser.add_argument('-w', '--window', default=None, type=str,
-    #                     help='number of frames in dr window')
-    # parser.add_argument('-s', '--shift', default=None, type=str,
-    #                     help='shift size between dr calculations')
-    # args = parser.parse_args()
+    parser = argparse.ArgumentParser(description='PyTorch Template')
+    parser.add_argument('-trj', '--trajectory', default=None, type=str,
+                        help='trajectory file in xtc format (or not in xtc)')
+    parser.add_argument('-top', '--topology', default=None, type=str,
+                        help='topology file in gro format')
+    parser.add_argument('-w', '--window', default=None, type=int,
+                        help='number of frames in dr window')
+    parser.add_argument('-s', '--shift', default=None, type=int,
+                        help='shift size between dr calculations')
+    args = parser.parse_args()
 
     start_time = time.time()
-    trj_temp = os.path.join("data", "100ns_NPT_8_8micelles.xtc")
-    top_temp = os.path.join("data", "100ns_NPT_8_8micelles.gro")
-    window_temp = 5000
-    shift_temp = 1
+    # trj_temp = os.path.join("data", "100ns_NPT_8_8micelles.xtc")
+    # top_temp = os.path.join("data", "100ns_NPT_8_8micelles.gro")
+    # window_temp = 5000
+    # shift_temp = 1
 
-    # calculate_diff_coefficients(args.trajectory, args.topology, args.window, args.shift)
-    calculate_diff_coefficients(trj_temp, top_temp, window_temp, shift_temp)
-    calculate_corr(trj_temp, top_temp)
+    calculate_diff_coefficients(args.trajectory, args.topology, args.window, args.shift)
+    # calculate_corr(args.trajectory, args.topology)
+    # calculate_diff_coefficients(trj_temp, top_temp, window_temp, shift_temp)
+    # calculate_corr(trj_temp, top_temp)
     print("--- %s seconds ---" % (time.time() - start_time))
