@@ -99,8 +99,8 @@ def calculate_diff_coefficients(trj_path: str, topol_path: str, window: int, shi
     df["ddr"] = df["dr"]
     for i in range(1, window):
         df["ddr"][i] = df["dr"][i] - df["dr"][i-1]
-    df['time, ps'] = np.array([i*500 for i in range(0, window)])
-    df = df[['time, ps', 'dr', 'ddr']]
+    df['time, fs'] = np.array([i*500 for i in range(0, window)])
+    df = df[['time, fs', 'dr', 'ddr']]
 
     path_out_dir = os.path.join("results", trj_path.split("/")[-1].split(".")[0])
     os.makedirs(path_out_dir, exist_ok=True)
@@ -179,10 +179,7 @@ def calculate_corr(trj_path: str, topol_path: str):
             if corr_calculated_times != 0:
                 df.loc[len(df.index)] = [frame.step, (corr_frame/corr_calculated_times_frame).item()]
 
-            # if frame.step == 5000:
-            #     break
-
-    path_out_dir = os.path.join("results", trj_path.split("/")[-1].split(".")[0])
+    path_out_dir = os.path.join("results_536only", trj_path.split("/")[-1].split(".")[0])
     os.makedirs(path_out_dir, exist_ok=True)
 
     df.to_csv(os.path.join(path_out_dir, f"corr_full"), sep='\t')
