@@ -105,7 +105,7 @@ def calculate_diff_coefficients(trj_path: str, topol_path: str, window: int, shi
     path_out_dir = os.path.join("results", trj_path.split("/")[-1].split(".")[0])
     os.makedirs(path_out_dir, exist_ok=True)
 
-    df.to_csv(os.path.join(path_out_dir, f"dr_{window}_{shift}_1"), sep='\t')
+    df.to_csv(os.path.join(path_out_dir, f"dr_{window}_{shift}_536only"), sep='\t')
 
 
 def calculate_corr(trj_path: str, topol_path: str):

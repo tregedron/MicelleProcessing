@@ -38,7 +38,7 @@ class DiffCalcer:
         self.till_last_time_calculated += 1
 
     def check_size(self):
-        if (self.aggregate_size >= 402) and (self.aggregate_size <= 670):
+        if (self.aggregate_size >= 536) and (self.aggregate_size <= 536):
             return True
         else:
             return False
