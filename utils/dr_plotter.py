@@ -1,4 +1,5 @@
 from utils import linear
+from utils import constant_func
 
 import numpy as np
 import pandas as pd
@@ -21,29 +22,42 @@ def process_dr(dr_path, start):
     out_dir = dr_path.split("/")[:-1]
     out_dir = os.path.join(*out_dir)
     dr = pd.read_csv(dr_path, sep='\t', index_col=0)
+    if not dr.isnull().any().any():
+        print(dr)
 
-    print(dr)
+        fig = plt.figure(figsize=(6, 6))
+        ax = fig.add_subplot(111)
+        ax.plot(dr.index, dr["dr"], 'b-', label='dr', markersize=3)
+        ax.set_title(f'dr of time {dr_path.split("/")[-1]}', fontsize=22, pad=8)
+        plt.legend()
+        plt.savefig(os.path.join(out_dir, f'{dr_path.split("/")[-1]}_dr_t.png'), bbox_inches='tight')
+        fig.tight_layout()
+        plt.close()
 
-    fig = plt.figure(figsize=(6, 6))
-    ax = fig.add_subplot(111)
-    ax.plot(dr.index, dr["dr"], 'b-', label='dr', markersize=3)
-    ax.set_title(f'dr of time {dr_path.split("/")[-1]}', fontsize=22, pad=8)
-    plt.legend()
-    plt.savefig(os.path.join(out_dir, f'{dr_path.split("/")[-1]}_dr_t.png'), bbox_inches='tight')
-    fig.tight_layout()
-    plt.close()
+        fig = plt.figure(figsize=(6, 6))
+        ax = fig.add_subplot(111)
+        ax.plot(dr.index, dr["ddr"], "o", color="red", label='ddr', markersize=3)
+        popt, pcov = curve_fit(linear, dr.index[start:], dr["ddr"][start:])
+        print(popt)
+        ax.plot(dr.index[start:], linear(dr.index[start:], *popt), 'b-', label='fit: a=%f, b=%f' % tuple(popt))
+        ax.set_title(f'ddr of time {dr_path.split("/")[-1]}', fontsize=22, pad=8)
+        plt.legend()
+        plt.savefig(os.path.join(out_dir, f'{dr_path.split("/")[-1]}_ddr_fit_linear.png'), bbox_inches='tight')
+        fig.tight_layout()
+        plt.close()
 
-    fig = plt.figure(figsize=(6, 6))
-    ax = fig.add_subplot(111)
-    ax.plot(dr.index, dr["ddr"], "o", color="red", label='ddr', markersize=3)
-    popt, pcov = curve_fit(linear, dr.index[start:], dr["ddr"][start:])
-    print(popt)
-    ax.plot(dr.index[start:], linear(dr.index[start:], *popt), 'b-', label='fit: a=%f, b=%f' % tuple(popt))
-    ax.set_title(f'ddr of time {dr_path.split("/")[-1]}', fontsize=22, pad=8)
-    plt.legend()
-    plt.savefig(os.path.join(out_dir, f'{dr_path.split("/")[-1]}_ddr_fit.png'), bbox_inches='tight')
-    fig.tight_layout()
-    plt.close()
+
+        fig = plt.figure(figsize=(6, 6))
+        ax = fig.add_subplot(111)
+        ax.plot(dr.index, dr["ddr"], "o", color="red", label='ddr', markersize=3)
+        popt, pcov = curve_fit(constant_func, dr.index[start:], dr["ddr"][start:])
+        print(popt)
+        ax.plot(dr.index[start:], constant_func(dr.index[start:], *popt), 'b-', label='fit: const=%f' % tuple(popt))
+        ax.set_title(f'ddr of time {dr_path.split("/")[-1]}', fontsize=22, pad=8)
+        plt.legend()
+        plt.savefig(os.path.join(out_dir, f'{dr_path.split("/")[-1]}_ddr_fit_const.png'), bbox_inches='tight')
+        fig.tight_layout()
+        plt.close()
 
 
 if __name__ == '__main__':

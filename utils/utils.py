@@ -62,6 +62,9 @@ def calc_list_correlation(corr_calcer_list):
 def linear(x, a, b):
     return a*x+b
 
+def constant_func(x, const):
+    return np.full((len(x), ), const)
+
 
 if __name__ == '__main__':
     a = np.array([1, 1, 0])
