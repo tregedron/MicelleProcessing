@@ -24,7 +24,6 @@ def process_dr(dr_path, start):
     following: 6*D = lim d<\delta r^2>/dt. Be careful the time is expected to be in ps, dr^2 in A^2. dr.index has 0.5
     because in my trajectories I wrote coordinates in file every 0.5 ps.
 
-
     :param dr_path:
     :param start:
     :return:
@@ -75,16 +74,59 @@ def process_dr(dr_path, start):
         fig.tight_layout()
         plt.close()
 
+def process_size_distribution(dist_path):
+    monomer_size = 67
+    out_dir = dist_path.split("/")[:-1]
+    out_dir = os.path.join(*out_dir)
+    dist = pd.read_csv(dist_path, sep='\t', index_col=0)
+
+    fig = plt.figure(figsize=(6, 6))
+    ax = fig.add_subplot(111)
+    ax.plot(dist.index[0:20*monomer_size]/monomer_size, dist["size"][0:20*monomer_size], 'b-', label='dr', markersize=3)
+    ax.set_title(f'Micelle size distribution in {dist_path.split("/")[-1]}', fontsize=22, pad=8)
+    plt.legend()
+    plt.savefig(os.path.join(out_dir, f'{dist_path.split("/")[-1]}_size_dist.png'), bbox_inches='tight')
+    fig.tight_layout()
+    plt.close()
+
+def process_number_distribution(dist_path):
+    out_dir = dist_path.split("/")[:-1]
+    out_dir = os.path.join(*out_dir)
+    dist = pd.read_csv(dist_path, sep='\t', index_col=0)
+
+    fig = plt.figure(figsize=(6, 6))
+    ax = fig.add_subplot(111)
+    ax.plot(dist.index, dist["number"], 'b-', label='dr', markersize=3)
+    ax.set_title(f'Number of micelles distribution in {dist_path.split("/")[-1]}', fontsize=22, pad=8)
+    plt.legend()
+    plt.savefig(os.path.join(out_dir, f'{dist_path.split("/")[-1]}_number_dist.png'), bbox_inches='tight')
+    fig.tight_layout()
+    plt.close()
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Use dr plotter to plot dr, fit it and find diffusion coefficient')
     parser.add_argument('-start', '--start', default=1000, type=int,
                         help='start fitting from')
+    parser.add_argument('-path', '--path-to-results', default="../results", type=str,
+                        help='path to results directory')
     args = parser.parse_args()
 
     start = args.start
+    path_to_results = args.path_to_results
 
-    for dirpath, dirnames, filenames in os.walk(os.path.join("../results")):
-        for filename in [f for f in filenames if "dr" in f and ".png" not in f]:
+    for dirpath, dirnames, filenames in os.walk(os.path.join(path_to_results)):
+        for filename in [f for f in filenames if "dr" in f and ".png" not in f and ".png" not in f]:
             file = os.path.join(dirpath, filename)
             process_dr(file, start)
+
+    for dirpath, dirnames, filenames in os.walk(os.path.join(path_to_results)):
+        for filename in [f for f in filenames if "size_distribution" in f and ".png" not in f]:
+            file = os.path.join(dirpath, filename)
+            process_size_distribution(file)
+
+    for dirpath, dirnames, filenames in os.walk(os.path.join(path_to_results)):
+        for filename in [f for f in filenames if "number_distribution" in f and ".png" not in f]:
+            file = os.path.join(dirpath, filename)
+            process_number_distribution(file)
+
