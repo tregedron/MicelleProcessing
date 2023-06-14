@@ -40,6 +40,9 @@ def calculate_diff_coefficients(trj_path: str, topol_path: str, window: int, shi
 
         selection = Selection("name O1 or name O2 or name O3 or name O4 or name O5")
 
+        size_distribution = np.zeros(4288)
+        micelles_on_frame = np.zeros(25)
+
         micelles_list = []
         diff_calcer_list = []
         ids = {}
@@ -62,6 +65,8 @@ def calculate_diff_coefficients(trj_path: str, topol_path: str, window: int, shi
             for atom_ind, cluster in enumerate(cluster.clustering):
                 cluster_indexes[cluster].append(atom_ind)
 
+            micelles_on_frame[number_of_clusters] += 1
+
             for cluster_id in range(number_of_clusters):
                 micelle_hash_id = hash(''.join(str(x) for x in cluster_indexes[cluster_id]))
                 if micelle_hash_id in ids.keys():
@@ -73,6 +78,7 @@ def calculate_diff_coefficients(trj_path: str, topol_path: str, window: int, shi
 
             positions_to_delete = []
             for ind, micelle in enumerate(micelles_list):
+                size_distribution[micelle.ask_size()] += 1
                 if micelle.updated:
                     micelle.calculate_mass_center(frame.cell.lengths)
                     micelle.calculate_gyradius(frame.cell.lengths)
@@ -93,6 +99,9 @@ def calculate_diff_coefficients(trj_path: str, topol_path: str, window: int, shi
             # if frame.step == 5000:
             #     for diff_calcer in diff_calcer_list:
             #         diff_calcer.collect_data(shifts, shifts_calculated_times)
+            #
+            #     print(size_distribution)
+            #     print(micelles_on_frame)
             #     break
 
     for diff_calcer in diff_calcer_list:
@@ -100,20 +109,24 @@ def calculate_diff_coefficients(trj_path: str, topol_path: str, window: int, shi
 
     print(f"there were {shifts_calculated_times} shifts")
     shifts = shifts/shifts_calculated_times
-
-    df = pd.DataFrame({'dr': shifts})
-    df['time, fs'] = np.array([i * trj_step_time for i in range(0, window)])
+    times = np.array([i * trj_step_time for i in range(0, window)])
     # ddr - numerical deviation d(dr^2)/d(t), dt is expected to be in ps.
-    df["ddr"] = df["dr"]
-    for i in range(1, window):
-        df["ddr"][i] = (df["dr"][i] - df["dr"][i-1])/(df['time, fs'][i] - df['time, fs'][i-1])*1000
-    df = df[['time, fs', 'dr', 'ddr']]
+    ddr = np.zeros(len(shifts))
+    for i in range(1, len(shifts)):
+        ddr[i] = (shifts[i] - shifts[i - 1]) / (times[i] - times[i - 1]) * 1000
 
-    path_out_dir = os.path.join("results", trj_path.split("/")[-1].split(".")[0])
+    dr = pd.DataFrame({'time, fs': times, 'dr': shifts, "ddr": ddr})
+
+    path_out_dir = os.path.join("results_536only", trj_path.split("/")[-1].split(".")[0])
     os.makedirs(path_out_dir, exist_ok=True)
 
-    df.to_csv(os.path.join(path_out_dir, f"dr_{window}_{shift}_536only"), sep='\t')
+    dr.to_csv(os.path.join(path_out_dir, f"dr_{window}_{shift}_536only"), sep='\t')
 
+    df = pd.DataFrame({'size': size_distribution})
+    df.to_csv(os.path.join(path_out_dir, f"size_distribution"), sep='\t')
+
+    df = pd.DataFrame({'number': micelles_on_frame})
+    df.to_csv(os.path.join(path_out_dir, f"number_distribution"), sep='\t')
 
 def calculate_corr(trj_path: str, topol_path: str):
     print("Working on trajectory", trj_path)
@@ -210,7 +223,7 @@ if __name__ == '__main__':
     start_time = time.time()
     # trj_temp = os.path.join("data", "100ns_NPT_8_8micelles.xtc")
     # top_temp = os.path.join("data", "100ns_NPT_8_8micelles.gro")
-    # window_temp = 5000
+    # window_temp = 10
     # shift_temp = 1
 
     calculate_diff_coefficients(args.trajectory, args.topology, args.window, args.shift)

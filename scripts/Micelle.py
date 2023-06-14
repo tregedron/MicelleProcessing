@@ -44,3 +44,6 @@ class Micelle:
     def calculate_gyradius(self, cell):
         self.gyradius = np.average(custom_distance_to_point(self.positions, self.mass_center, cell),
                                    weights=self.masses, axis=0)
+
+    def ask_size(self):
+        return self.size
