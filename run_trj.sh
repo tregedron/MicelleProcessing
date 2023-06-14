@@ -2,8 +2,6 @@ JOBS_COUNTER=0
 MAX_CHILDREN=11
 MY_PID=$$
 
-source venv/bin/activate
-
 for xtc_file in data/*.xtc;
 do
     JOBS_COUNTER=$((`ps ax -Ao ppid | grep $MY_PID | wc -l`))
@@ -22,7 +20,5 @@ do
     JOBS_COUNTER=$((`ps ax -Ao ppid | grep $MY_PID | wc -l`))
     sleep 1
 done
-
-python utils/dr_plotter.py
 
 echo Done
