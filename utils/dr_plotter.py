@@ -18,16 +18,32 @@ def fit_dr(dr):
 
 
 def process_dr(dr_path, start):
+    # TODO Add the parameter for conversion of dr.index to dt. 0.5 fix! maybe convert the second column to the time.
+    '''
+    The function gets path to the set of time-mean square dispalecement (MSD) dependencies. The approximation is the
+    following: 6*D = lim d<\delta r^2>/dt. Be careful the time is expected to be in ps, dr^2 in A^2. dr.index has 0.5
+    because in my trajectories I wrote coordinates in file every 0.5 ps.
+
+
+    :param dr_path:
+    :param start:
+    :return:
+    '''
     print(dr_path)
     out_dir = dr_path.split("/")[:-1]
     out_dir = os.path.join(*out_dir)
     dr = pd.read_csv(dr_path, sep='\t', index_col=0)
+
+    # # this code will be deleted in the future.
+    # # ddr - numerical deviation d(dr^2)/d(t), dt is expected to be in ps.
+    # for i in range(1, len(dr["dr"])):
+    #     dr["ddr"].loc[i] = (dr["dr"][i] - dr["dr"][i - 1]) / (dr['time, fs'][i] - dr['time, fs'][i - 1]) * 1000
+
     if not dr.isnull().any().any():
-        print(dr)
 
         fig = plt.figure(figsize=(6, 6))
         ax = fig.add_subplot(111)
-        ax.plot(dr.index, dr["dr"], 'b-', label='dr', markersize=3)
+        ax.plot(0.5*dr.index, dr["dr"], 'b-', label='dr', markersize=3)
         ax.set_title(f'dr of time {dr_path.split("/")[-1]}', fontsize=22, pad=8)
         plt.legend()
         plt.savefig(os.path.join(out_dir, f'{dr_path.split("/")[-1]}_dr_t.png'), bbox_inches='tight')
@@ -36,10 +52,10 @@ def process_dr(dr_path, start):
 
         fig = plt.figure(figsize=(6, 6))
         ax = fig.add_subplot(111)
-        ax.plot(dr.index, dr["ddr"], "o", color="red", label='ddr', markersize=3)
-        popt, pcov = curve_fit(linear, dr.index[start:], dr["ddr"][start:])
+        ax.plot(0.5*dr.index, dr["ddr"], "o", color="red", label='ddr', markersize=3)
+        popt, pcov = curve_fit(linear, 0.5*dr.index[start:], dr["ddr"][start:])
         print(popt)
-        ax.plot(dr.index[start:], linear(dr.index[start:], *popt), 'b-', label='fit: a=%f, b=%f' % tuple(popt))
+        ax.plot(0.5*dr.index[start:], linear(0.5*dr.index[start:], *popt), 'b-', label='fit: a=%f, b=%f' % tuple(popt))
         ax.set_title(f'ddr of time {dr_path.split("/")[-1]}', fontsize=22, pad=8)
         plt.legend()
         plt.savefig(os.path.join(out_dir, f'{dr_path.split("/")[-1]}_ddr_fit_linear.png'), bbox_inches='tight')
@@ -49,10 +65,10 @@ def process_dr(dr_path, start):
 
         fig = plt.figure(figsize=(6, 6))
         ax = fig.add_subplot(111)
-        ax.plot(dr.index, dr["ddr"], "o", color="red", label='ddr', markersize=3)
-        popt, pcov = curve_fit(constant_func, dr.index[start:], dr["ddr"][start:])
+        ax.plot(0.5*dr.index, dr["ddr"], "o", color="red", label='ddr', markersize=3)
+        popt, pcov = curve_fit(constant_func, 0.5*dr.index[start:], dr["ddr"][start:])
         print(popt)
-        ax.plot(dr.index[start:], constant_func(dr.index[start:], *popt), 'b-', label='fit: const=%f' % tuple(popt))
+        ax.plot(0.5*dr.index[start:], constant_func(0.5*dr.index[start:], *popt), 'b-', label='fit: const=%f' % tuple(popt))
         ax.set_title(f'ddr of time {dr_path.split("/")[-1]}', fontsize=22, pad=8)
         plt.legend()
         plt.savefig(os.path.join(out_dir, f'{dr_path.split("/")[-1]}_ddr_fit_const.png'), bbox_inches='tight')
@@ -61,7 +77,7 @@ def process_dr(dr_path, start):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='')
+    parser = argparse.ArgumentParser(description='Use dr plotter to plot dr, fit it and find diffusion coefficient')
     parser.add_argument('-start', '--start', default=1000, type=int,
                         help='start fitting from')
     args = parser.parse_args()

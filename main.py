@@ -12,14 +12,20 @@ import time
 import argparse
 
 
-def calculate_diff_coefficients(trj_path: str, topol_path: str, window: int, shift: int):
-    '''
-    usage example: python main.py -trj data/100ns_NPT_1_8_ext.xtc -top data/100ns_NPT_1_8micelles.gro -w 5000 -s 1 > logs/log_1_8_1_ext
+def calculate_diff_coefficients(trj_path: str, topol_path: str, window: int, shift: int, trj_step_time=500):
 
-    :param trj_path:
-    :param topol_path:
-    :param window:
-    :param shift:
+    '''
+    usage example:
+    python main.py -trj data/100ns_NPT_1_8_ext.xtc -top data/100ns_NPT_1_8micelles.gro -w 5000 -s 1 > logs/log_1_8_1_ext
+
+
+
+    :param trj_path:path to trajectory. The xtc format is usually used here.
+    :param topol_path: path to topology in gro format. The atoms names are provided by it.
+    :param window: number of steps in dr array calculations. The big enough window is necessary to be chosen for dr
+    to pass balistic regime.
+    :param shift: number of steps between dr array calculations.
+    :param trj_step_time: time of 1 step in trajectory. The time that elapse between writing position coordinates
     :return:
     '''
     print("Working on trajectory", trj_path)
@@ -96,10 +102,11 @@ def calculate_diff_coefficients(trj_path: str, topol_path: str, window: int, shi
     shifts = shifts/shifts_calculated_times
 
     df = pd.DataFrame({'dr': shifts})
+    df['time, fs'] = np.array([i * trj_step_time for i in range(0, window)])
+    # ddr - numerical deviation d(dr^2)/d(t), dt is expected to be in ps.
     df["ddr"] = df["dr"]
     for i in range(1, window):
-        df["ddr"][i] = df["dr"][i] - df["dr"][i-1]
-    df['time, fs'] = np.array([i*500 for i in range(0, window)])
+        df["ddr"][i] = (df["dr"][i] - df["dr"][i-1])/(df['time, fs'][i] - df['time, fs'][i-1])*1000
     df = df[['time, fs', 'dr', 'ddr']]
 
     path_out_dir = os.path.join("results", trj_path.split("/")[-1].split(".")[0])
