@@ -18,8 +18,6 @@ def calculate_diff_coefficients(trj_path: str, topol_path: str, window: int, shi
     usage example:
     python main.py -trj data/100ns_NPT_1_8_ext.xtc -top data/100ns_NPT_1_8micelles.gro -w 5000 -s 1 > logs/log_1_8_1_ext
 
-
-
     :param trj_path:path to trajectory. The xtc format is usually used here.
     :param topol_path: path to topology in gro format. The atoms names are provided by it.
     :param window: number of steps in dr array calculations. The big enough window is necessary to be chosen for dr
@@ -65,7 +63,7 @@ def calculate_diff_coefficients(trj_path: str, topol_path: str, window: int, shi
             for atom_ind, cluster in enumerate(cluster.clustering):
                 cluster_indexes[cluster].append(atom_ind)
 
-            micelles_on_frame[number_of_clusters] += 1
+
 
             for cluster_id in range(number_of_clusters):
                 micelle_hash_id = hash(''.join(str(x) for x in cluster_indexes[cluster_id]))
@@ -103,7 +101,7 @@ def calculate_diff_coefficients(trj_path: str, topol_path: str, window: int, shi
             #     print(size_distribution)
             #     print(micelles_on_frame)
             #     break
-
+        micelles_on_frame[number_of_clusters] += 1
     for diff_calcer in diff_calcer_list:
         diff_calcer.collect_data(shifts, shifts_calculated_times)
 
@@ -117,10 +115,10 @@ def calculate_diff_coefficients(trj_path: str, topol_path: str, window: int, shi
 
     dr = pd.DataFrame({'time, fs': times, 'dr': shifts, "ddr": ddr})
 
-    path_out_dir = os.path.join("results_536only", trj_path.split("/")[-1].split(".")[0])
+    path_out_dir = os.path.join("results", trj_path.split("/")[-1].split(".")[0])
     os.makedirs(path_out_dir, exist_ok=True)
 
-    dr.to_csv(os.path.join(path_out_dir, f"dr_{window}_{shift}_536only"), sep='\t')
+    dr.to_csv(os.path.join(path_out_dir, f"dr_{window}_{shift}"), sep='\t')
 
     df = pd.DataFrame({'size': size_distribution})
     df.to_csv(os.path.join(path_out_dir, f"size_distribution"), sep='\t')
@@ -199,7 +197,7 @@ def calculate_corr(trj_path: str, topol_path: str):
             if corr_calculated_times != 0:
                 df.loc[len(df.index)] = [frame.step, (corr_frame/corr_calculated_times_frame).item()]
 
-    path_out_dir = os.path.join("results_536only", trj_path.split("/")[-1].split(".")[0])
+    path_out_dir = os.path.join("results", trj_path.split("/")[-1].split(".")[0])
     os.makedirs(path_out_dir, exist_ok=True)
 
     df.to_csv(os.path.join(path_out_dir, f"corr_full"), sep='\t')
