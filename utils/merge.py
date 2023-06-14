@@ -26,12 +26,14 @@ def merge_two_drs(dr_path_1: str, dr_path_2: str, out_name="merged_dr"):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='PyTorch Template')
+    parser = argparse.ArgumentParser(description='use merger to merge two drs of the same system')
     parser.add_argument('-dr1', '--dr_path_1', default=None, type=str,
                         help='dr1 path')
     parser.add_argument('-dr2', '--dr_path_2', default=None, type=str,
                         help='dr2 path')
+    parser.add_argument('-out', '--out_path', default=None, type=str,
+                        help='out path')
     args = parser.parse_args()
 
-    merge_two_drs(args.dr_path_1, args.dr_path_2)
+    merge_two_drs(args.dr_path_1, args.dr_path_2, args.out_path)
 
