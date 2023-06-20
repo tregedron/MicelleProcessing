@@ -51,7 +51,7 @@ def process_dr(dr_path, start):
 
         fig = plt.figure(figsize=(6, 6))
         ax = fig.add_subplot(111)
-        ax.plot(0.5*dr.index, dr["ddr"], "o", color="red", label='ddr', markersize=3)
+        ax.plot(0.5*dr.index[1:], dr["ddr"][1:], "o", color="red", label='ddr', markersize=3)
         popt, pcov = curve_fit(linear, 0.5*dr.index[start:], dr["ddr"][start:])
         print(popt)
         ax.plot(0.5*dr.index[start:], linear(0.5*dr.index[start:], *popt), 'b-', label='fit: a=%f, b=%f' % tuple(popt))
@@ -64,7 +64,7 @@ def process_dr(dr_path, start):
 
         fig = plt.figure(figsize=(6, 6))
         ax = fig.add_subplot(111)
-        ax.plot(0.5*dr.index, dr["ddr"], "o", color="red", label='ddr', markersize=3)
+        ax.plot(0.5*dr.index[1:], dr["ddr"][1:], "o", color="red", label='ddr', markersize=3)
         popt, pcov = curve_fit(constant_func, 0.5*dr.index[start:], dr["ddr"][start:])
         print(popt)
         ax.plot(0.5*dr.index[start:], constant_func(0.5*dr.index[start:], *popt), 'b-', label='fit: const=%f' % tuple(popt))
@@ -116,7 +116,7 @@ if __name__ == '__main__':
     path_to_results = args.path_to_results
 
     for dirpath, dirnames, filenames in os.walk(os.path.join(path_to_results)):
-        for filename in [f for f in filenames if "dr" in f and ".png" not in f and ".png" not in f]:
+        for filename in [f for f in filenames if "dr" in f and ".png" not in f]:
             file = os.path.join(dirpath, filename)
             process_dr(file, start)
 
