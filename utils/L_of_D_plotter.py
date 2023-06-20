@@ -16,14 +16,14 @@ def calc_viscosity(alpha, T=223):
     [1/L] = 1/nm = 10^(9) m
     k = 1.38*10^(-23) J/K
 
-    1.38*10^(-23) * T / (6 * pi * alpha * 10^(-17) ) = eta, ms/kg
+    1.38*10^(-23) * T * 2.38 / (6 * pi * alpha * 10^(-17) ) = eta, ms/kg
     [eta] = mPa*s = 10^(-3) ms/kg
 
     :param alpha: parameter from fitting D of 1/L
     :return: viscosity of solution in mPa*s
     '''
 
-    viscosity = 1.38 * 10**(-23) * T / (6 * math.pi * alpha * 10**(-17))
+    viscosity = 1.38 * 10**(-23) * T * 2.38 / (6 * math.pi * alpha * 10**(-17))
     viscosity = -1 * viscosity*1000
     if viscosity<0:
         print("You are currently breaking the laws of hydrodynamics... viscosity can't be negative")
@@ -69,8 +69,11 @@ def process_DofL(DofL_path):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
-    parser.add_argument('-path', '--path', default="../results/DofL", type=str,
+    parser.add_argument('-path', '--path', default="../results_536only", type=str,
                         help='path to D of L data')
     args = parser.parse_args()
 
-    process_DofL(args.path)
+    for dirpath, dirnames, filenames in os.walk(os.path.join(args.path)):
+        for filename in [f for f in filenames if "DofL" in f and ".png" not in f]:
+            file = os.path.join(dirpath, filename)
+            process_DofL(file)
