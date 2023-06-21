@@ -1,6 +1,6 @@
 xtc_file=$1
 
-window=10000
+window=30000
 shift=1
 
 xtc_file=$(basename "${xtc_file%.xtc}")
