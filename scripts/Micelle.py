@@ -38,7 +38,7 @@ class Micelle:
         dzeta = np.sin(theta)
         ksi = np.average(ksi, weights=self.masses, axis=0)
         dzeta = np.average(dzeta, weights=self.masses, axis=0)
-        theta = np.arctan2(-ksi, -dzeta) + np.pi
+        theta = np.arctan2(-dzeta, -ksi) + np.pi
         self.mass_center = theta / (2*np.pi) * cell
 
     def calculate_gyradius(self, cell):
