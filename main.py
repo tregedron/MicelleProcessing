@@ -1,4 +1,4 @@
-from chemfiles import Trajectory, Selection
+from chemfiles import Trajectory, Selection, Frame, Topology, Atom
 from tqdm import tqdm
 from scripts.Cluster import Cluster
 from scripts.Micelle import Micelle
@@ -26,6 +26,10 @@ def calculate_diff_coefficients(trj_path: str, topol_path: str, window: int, shi
     :param trj_step_time: time of 1 step in trajectory. The time that elapse between writing position coordinates
     :return:
     '''
+
+    path_out_dir = os.path.join("results", trj_path.split("/")[-1].split(".")[0])
+    os.makedirs(path_out_dir, exist_ok=True)
+
     print("Working on trajectory", trj_path)
     print("topology: ", topol_path)
     print("Window: ", window, " shift: ", shift)
@@ -93,7 +97,7 @@ def calculate_diff_coefficients(trj_path: str, topol_path: str, window: int, shi
 
             micelles_on_frame[len(micelles_list)] = micelles_on_frame[len(micelles_list)] + 1
             print("Step = ", frame.step, len(micelles_list), " micelles ", ids, shifts_calculated_times)
-            # if frame.step == 5000:
+            # if frame.step == 0:
             #     for diff_calcer in diff_calcer_list:
             #         diff_calcer.collect_data(shifts, shifts_calculated_times)
             #
