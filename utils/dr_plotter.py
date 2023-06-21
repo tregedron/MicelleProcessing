@@ -34,11 +34,6 @@ def process_dr(dr_path, start):
     out_dir = os.path.join(*out_dir)
     dr = pd.read_csv(dr_path, sep='\t', index_col=0)
 
-    # # this code will be deleted in the future.
-    # # ddr - numerical deviation d(dr^2)/d(t), dt is expected to be in ps.
-    # for i in range(1, len(dr["dr"])):
-    #     dr["ddr"].loc[i] = (dr["dr"][i] - dr["dr"][i - 1]) / (dr['time, fs'][i] - dr['time, fs'][i - 1]) * 1000
-
     if not dr.isnull().any().any():
 
         fig = plt.figure(figsize=(6, 6))
@@ -46,7 +41,7 @@ def process_dr(dr_path, start):
         ax.plot(0.5*dr.index, dr["dr"], 'b-', label='dr', markersize=3)
         ax.set_title(f'dr of time {dr_path.split("/")[-1]}', fontsize=22, pad=8)
         plt.legend()
-        plt.savefig(os.path.join(out_dir, f'{dr_path.split("/")[-1]}_dr_t.png'), bbox_inches='tight')
+        plt.savefig(os.path.join(out_dir, f'{dr_path.split("/")[-1]}_dr_t.pdf'), bbox_inches='tight')
         fig.tight_layout()
         plt.close()
 
@@ -58,10 +53,9 @@ def process_dr(dr_path, start):
         ax.plot(0.5*dr.index[start:], linear(0.5*dr.index[start:], *popt), 'b-', label='fit: a=%f, b=%f' % tuple(popt))
         ax.set_title(f'ddr of time {dr_path.split("/")[-1]}', fontsize=22, pad=8)
         plt.legend()
-        plt.savefig(os.path.join(out_dir, f'{dr_path.split("/")[-1]}_ddr_fit_linear.png'), bbox_inches='tight')
+        plt.savefig(os.path.join(out_dir, f'{dr_path.split("/")[-1]}_ddr_fit_linear.pdf'), bbox_inches='tight')
         fig.tight_layout()
         plt.close()
-
 
         fig = plt.figure(figsize=(6, 6))
         ax = fig.add_subplot(111)
@@ -71,9 +65,11 @@ def process_dr(dr_path, start):
         ax.plot(0.5*dr.index[start:], constant_func(0.5*dr.index[start:], *popt), 'b-', label='fit: const=%f' % tuple(popt))
         ax.set_title(f'ddr of time {dr_path.split("/")[-1]}', fontsize=22, pad=8)
         plt.legend()
-        plt.savefig(os.path.join(out_dir, f'{dr_path.split("/")[-1]}_ddr_fit_const.png'), bbox_inches='tight')
+        plt.savefig(os.path.join(out_dir, f'{dr_path.split("/")[-1]}_ddr_fit_const.pdf'), bbox_inches='tight')
         fig.tight_layout()
         plt.close()
+
+        return popt[0]
 
 def process_size_distribution(dist_path):
     monomer_size = 67
@@ -95,7 +91,7 @@ def process_size_distribution(dist_path):
     # ax.tick_params(which='major', length=7)
     # ax.tick_params(which='minor', length=4, color='r')
     plt.legend()
-    plt.savefig(os.path.join(out_dir, f'{dist_path.split("/")[-1]}_size_dist.png'), bbox_inches='tight')
+    plt.savefig(os.path.join(out_dir, f'{dist_path.split("/")[-1]}_size_dist.pdf'), bbox_inches='tight')
     fig.tight_layout()
     plt.close()
 
@@ -120,7 +116,7 @@ def process_number_distribution(dist_path):
     # ax.tick_params(which='major', length=7)
     # ax.tick_params(which='minor', length=4, color='r')
     plt.legend()
-    plt.savefig(os.path.join(out_dir, f'{dist_path.split("/")[-1]}_number_dist.png'), bbox_inches='tight')
+    plt.savefig(os.path.join(out_dir, f'{dist_path.split("/")[-1]}_number_dist.pdf'), bbox_inches='tight')
     fig.tight_layout()
     plt.close()
 
@@ -136,18 +132,25 @@ if __name__ == '__main__':
     start = args.start
     path_to_results = args.path_to_results
 
-    for dirpath, dirnames, filenames in os.walk(os.path.join(path_to_results)):
-        for filename in [f for f in filenames if "dr" in f and ".png" not in f]:
-            file = os.path.join(dirpath, filename)
-            process_dr(file, start)
+    names = []
+    D6_list = []
 
     for dirpath, dirnames, filenames in os.walk(os.path.join(path_to_results)):
-        for filename in [f for f in filenames if "size_distribution" in f and ".png" not in f]:
+        for filename in [f for f in filenames if "dr" in f and ".pdf" not in f and ".png" not in f]:
+            file = os.path.join(dirpath, filename)
+            names.append(file.split("/")[-2])
+            D6_list.append(process_dr(file, start))
+
+    df = pd.DataFrame({'Name': names, '6D': D6_list})
+    df.to_csv(os.path.join("../results", "D_in_Systems.csv"), sep='\t')
+
+    for dirpath, dirnames, filenames in os.walk(os.path.join(path_to_results)):
+        for filename in [f for f in filenames if "size_distribution" in f and ".pdf" not in f and ".png" not in f]:
             file = os.path.join(dirpath, filename)
             process_size_distribution(file)
 
     for dirpath, dirnames, filenames in os.walk(os.path.join(path_to_results)):
-        for filename in [f for f in filenames if "number_distribution" in f and ".png" not in f]:
+        for filename in [f for f in filenames if "number_distribution" in f and ".pdf" not in f and ".png" not in f]:
             file = os.path.join(dirpath, filename)
             process_number_distribution(file)
 
