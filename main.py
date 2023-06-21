@@ -63,8 +63,6 @@ def calculate_diff_coefficients(trj_path: str, topol_path: str, window: int, shi
             for atom_ind, cluster in enumerate(cluster.clustering):
                 cluster_indexes[cluster].append(atom_ind)
 
-
-
             for cluster_id in range(number_of_clusters):
                 micelle_hash_id = hash(''.join(str(x) for x in cluster_indexes[cluster_id]))
                 if micelle_hash_id in ids.keys():
@@ -126,6 +124,7 @@ def calculate_diff_coefficients(trj_path: str, topol_path: str, window: int, shi
 
     df = pd.DataFrame({'number': micelles_on_frame})
     df.to_csv(os.path.join(path_out_dir, f"number_distribution"), sep='\t')
+
 
 def calculate_corr(trj_path: str, topol_path: str):
     print("Working on trajectory", trj_path)
