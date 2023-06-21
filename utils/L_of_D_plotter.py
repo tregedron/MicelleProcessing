@@ -54,11 +54,11 @@ def process_DofL(DofL_path):
     ax.plot(1/DofL["L"], linear(1/DofL["L"], *popt), 'b-', label='fit: a=%f, b=%f' % tuple(popt))
     font_size = 22
     ax.set_title(f'D of 1/L', fontsize=30, pad=8)
-    ax.set_ylabel("D, A^2/ps", fontsize=font_size)
-    ax.set_xlabel("1/L, 1/nm", fontsize=font_size)
+    ax.set_ylabel("D, A$^2$/ps", fontsize=font_size)
+    ax.set_xlabel("1/L, nm$^{-1}$", fontsize=font_size)
 
     text_visc = f'Viscosity = {viscosity:.3f} mPa*s'
-    text_D = f"$D_0$ = {popt[1]*10**(-4):.3E} cm^2/s"
+    text_D = f"$D_0$ = {popt[1]*10**(-4):.3E} $cm^2$/s"
     plt.scatter([], [], color="w", alpha=0, label=text_visc)
     plt.scatter([], [], color="w", alpha=0, label=text_D)
     plt.legend()
@@ -69,7 +69,7 @@ def process_DofL(DofL_path):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
-    parser.add_argument('-path', '--path', default="../results_536only", type=str,
+    parser.add_argument('-path', '--path', default="../results", type=str,
                         help='path to D of L data')
     args = parser.parse_args()
 

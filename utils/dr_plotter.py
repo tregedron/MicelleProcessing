@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 import argparse
 import os
+from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
 
 
 def func(x, a, b):
@@ -79,11 +80,20 @@ def process_size_distribution(dist_path):
     out_dir = dist_path.split("/")[:-1]
     out_dir = os.path.join(*out_dir)
     dist = pd.read_csv(dist_path, sep='\t', index_col=0)
+    font_size = 22
 
     fig = plt.figure(figsize=(6, 6))
     ax = fig.add_subplot(111)
     ax.plot(dist.index[0:20*monomer_size]/monomer_size, dist["size"][0:20*monomer_size], 'b-', label='dr', markersize=3)
-    ax.set_title(f'Micelle size distribution in {dist_path.split("/")[-1]}', fontsize=22, pad=8)
+    ax.set_title(f'Micelle size distribution', fontsize=font_size, pad=8)
+    ax.set_ylabel("Number of micelles", fontsize=font_size)
+    ax.set_xlabel("Monomers in micelle", fontsize=font_size)
+    ax.xaxis.set_major_locator(MultipleLocator(3))
+    ax.xaxis.set_major_formatter('{x:.0f}')
+    ax.xaxis.set_minor_locator(MultipleLocator(1))
+    # ax.tick_params(which='both', width=2)
+    # ax.tick_params(which='major', length=7)
+    # ax.tick_params(which='minor', length=4, color='r')
     plt.legend()
     plt.savefig(os.path.join(out_dir, f'{dist_path.split("/")[-1]}_size_dist.png'), bbox_inches='tight')
     fig.tight_layout()
@@ -93,11 +103,22 @@ def process_number_distribution(dist_path):
     out_dir = dist_path.split("/")[:-1]
     out_dir = os.path.join(*out_dir)
     dist = pd.read_csv(dist_path, sep='\t', index_col=0)
+    font_size = 22
 
     fig = plt.figure(figsize=(6, 6))
     ax = fig.add_subplot(111)
+    ax.set_xlim([0, 10])
+    # ax.set_ylim([ymin, ymax])
     ax.plot(dist.index, dist["number"], 'b-', label='dr', markersize=3)
-    ax.set_title(f'Number of micelles distribution in {dist_path.split("/")[-1]}', fontsize=22, pad=8)
+    ax.set_title(f'Number of micelles distribution', fontsize=font_size, pad=8)
+    ax.set_ylabel("Frames counted", fontsize=font_size)
+    ax.set_xlabel("N micelles in system", fontsize=font_size)
+    ax.xaxis.set_major_locator(MultipleLocator(5))
+    ax.xaxis.set_major_formatter('{x:.0f}')
+    ax.xaxis.set_minor_locator(MultipleLocator(1))
+    # ax.tick_params(which='both', width=2)
+    # ax.tick_params(which='major', length=7)
+    # ax.tick_params(which='minor', length=4, color='r')
     plt.legend()
     plt.savefig(os.path.join(out_dir, f'{dist_path.split("/")[-1]}_number_dist.png'), bbox_inches='tight')
     fig.tight_layout()
