@@ -93,6 +93,7 @@ def calculate_diff_coefficients(trj_path: str, topol_path: str, window: int, shi
                     micelles_list.pop(position)
                     diff_calcer_list.pop(position)
 
+            micelles_on_frame[len(micelles_list)] = micelles_on_frame[len(micelles_list)] + 1
             print("Step = ", frame.step, len(micelles_list), " micelles ", ids, shifts_calculated_times)
             # if frame.step == 5000:
             #     for diff_calcer in diff_calcer_list:
@@ -101,7 +102,7 @@ def calculate_diff_coefficients(trj_path: str, topol_path: str, window: int, shi
             #     print(size_distribution)
             #     print(micelles_on_frame)
             #     break
-        micelles_on_frame[number_of_clusters] += 1
+
     for diff_calcer in diff_calcer_list:
         diff_calcer.collect_data(shifts, shifts_calculated_times)
 
