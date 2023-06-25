@@ -34,7 +34,7 @@ def process_DofL(DofL_path):
     print(DofL_path)
     out_dir = DofL_path.split("/")[:-1]
     out_dir = os.path.join(*out_dir)
-    DofL = pd.read_csv(DofL_path, sep='\t')
+    DofL = pd.read_csv(DofL_path, sep=',')
 
     L_inv = [1/DofL["L"].values]
 
@@ -74,6 +74,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     for dirpath, dirnames, filenames in os.walk(os.path.join(args.path)):
-        for filename in [f for f in filenames if "DofL" in f and ".png" not in f]:
+        for filename in [f for f in filenames if "D_in_Systems" in f and ".png" not in f]:
             file = os.path.join(dirpath, filename)
             process_DofL(file)
