@@ -13,7 +13,7 @@ def calculate_diff_coefficient_molecule(trj_path: str,
                                         topol_path: str,
                                         window: int,
                                         shift: int,
-                                        atom: str,
+                                        atom="C1",
                                         trj_step_time=500):
 
     '''
@@ -75,7 +75,7 @@ def calculate_diff_coefficient_molecule(trj_path: str,
 
     dr = pd.DataFrame({'time, fs': times, 'dr': shifts, "ddr": ddr})
 
-    path_out_dir = os.path.join("results", trj_path.split("/")[-1].split(".")[0])
+    path_out_dir = os.path.join("results_heptane", trj_path.split("/")[-1].split(".")[0])
     os.makedirs(path_out_dir, exist_ok=True)
 
     dr.to_csv(os.path.join(path_out_dir, f"dr_{atom}_{window}_{shift}"), sep='\t')
@@ -101,7 +101,7 @@ if __name__ == '__main__':
     # window_temp = 10
     # shift_temp = 1
 
-    calculate_diff_coefficient_molecule(args.trajectory, args.topology, args.window, args.shift, args.atom_mass_center)
+    calculate_diff_coefficient_molecule(args.trajectory, args.topology, args.window, args.shift)
     # calculate_corr(args.trajectory, args.topology)
     # calculate_diff_coefficients(trj_temp, top_temp, window_temp, shift_temp)
     # calculate_corr(trj_temp, top_temp)
