@@ -1,10 +1,8 @@
 JOBS_COUNTER=0
-MAX_CHILDREN=11
+MAX_CHILDREN=9
 MY_PID=$$
-results="results_8_15k"
-data_path="data_8"
 
-for xtc_file in $data_path/*.xtc;
+for xtc_file in data_heptane/*.xtc;
 do
     JOBS_COUNTER=$((`ps ax -Ao ppid | grep $MY_PID | wc -l`))
     while [ $JOBS_COUNTER -ge $MAX_CHILDREN ]
@@ -12,7 +10,7 @@ do
         JOBS_COUNTER=$((`ps ax -Ao ppid | grep $MY_PID | wc -l`))
     done
 
-    ./analysis.sh $xtc_file $results $data_path &
+    ./analysis_mol.sh $xtc_file &
 done
 
 echo Finishing children ...
@@ -24,7 +22,3 @@ do
 done
 
 echo Done
-
-source venv/bin/activate
-
-python utils/dr_plotter.py -path "${results}"
