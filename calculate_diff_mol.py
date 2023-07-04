@@ -38,16 +38,17 @@ def calculate_diff_coefficient_molecule(trj_path: str,
 
     diff_calcer_list = []
 
-    with Trajectory(topol_path) as trajectory:
-        trajectory.set_topology(topol_path)
-        for frame in trajectory:
+    with Trajectory(topol_path) as trajectory_top:
+        trajectory_top.set_topology(topol_path)
+        for frame in trajectory_top:
             selection = Selection("name " + atom +" and resname C7H16")
             list_selection_ids = selection.evaluate(frame)
             positions = frame.positions[list_selection_ids]
+
             for i in range(len(positions)):
                 diff_calcer_list.append(DiffCalcerMol(i, window, shift, 1))
 
-            print(len(diff_calcer_list))
+    print("hello", len(diff_calcer_list))
 
     with Trajectory(trj_path) as trajectory:
         trajectory.set_topology(topol_path)
@@ -57,11 +58,6 @@ def calculate_diff_coefficient_molecule(trj_path: str,
             for ind, position in enumerate(positions):
                 diff_calcer_list[ind].update_coordinates(position, frame.cell.lengths)
 
-            # if frame.step == 4500:
-            #     for diff_calcer in diff_calcer_list:
-            #         diff_calcer.collect_data(shifts, shifts_calculated_times)
-
-                break
     for diff_calcer in diff_calcer_list:
         diff_calcer.collect_data(shifts, shifts_calculated_times)
 
@@ -96,13 +92,13 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     start_time = time.time()
-    # trj_temp = os.path.join("data", "100ns_NPT_8_8micelles.xtc")
-    # top_temp = os.path.join("data", "100ns_NPT_8_8micelles.gro")
-    # window_temp = 10
+    # trj_temp = os.path.join("data_heptane", "1000_C1.xtc")
+    # top_temp = os.path.join("data_heptane", "1000_C1.gro")
+    # window_temp = 20000
     # shift_temp = 1
 
     calculate_diff_coefficient_molecule(args.trajectory, args.topology, args.window, args.shift)
     # calculate_corr(args.trajectory, args.topology)
-    # calculate_diff_coefficients(trj_temp, top_temp, window_temp, shift_temp)
+    # calculate_diff_coefficient_molecule(trj_temp, top_temp, window_temp, shift_temp)
     # calculate_corr(trj_temp, top_temp)
     print("--- %s seconds ---" % (time.time() - start_time))
