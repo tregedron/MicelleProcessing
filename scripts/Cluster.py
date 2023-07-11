@@ -26,17 +26,11 @@ class Cluster:
 
             self.positions = self.frame.positions[list_selection_ids]
 
-    def expand_clustering_to_full_frame_1(self):
-        frame_labels = []
-        for key in self.dict_residue_to_selected_atom.keys():
-            for ind in self.frame.topology.residues[key-1].atoms:
-                frame_labels.append(self.clustering[self.dict_residue_to_selected_atom[key][0]])
-        self.clustering = frame_labels
-
     def expand_clustering_to_full_frame(self):
         frame_labels = []
+        shift = list(self.dict_residue_to_selected_atom.keys())[0]
         for key in self.dict_residue_to_selected_atom.keys():
-            for ind in self.frame.topology.residues[key-1].atoms:
+            for ind in self.frame.topology.residues[key-shift].atoms:
                 frame_labels.append(self.clustering[self.dict_residue_to_selected_atom[key][0]])
         self.clustering = frame_labels
 
